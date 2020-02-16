@@ -22,7 +22,7 @@ description:
   >   }
   >   deriving Generic
   >   deriving ( Semigroup, Monoid, Group )
-  >     via Generically MyRecord
+  >     via GenericProduct MyRecord
 
 source-repository head
   type: git
@@ -34,7 +34,7 @@ library
       base
         >= 4.12 && < 4.15
     , generic-data
-        >= 0.6.0.1 && < 0.7.0.0
+        ^>= 0.8.0.0
     , groups
         ^>= 0.4.0.0
 

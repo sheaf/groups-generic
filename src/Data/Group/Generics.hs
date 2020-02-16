@@ -1,5 +1,6 @@
 {-# LANGUAGE
     FlexibleContexts
+  , MonoLocalBinds
   , ScopedTypeVariables
   , TypeApplications
   , UndecidableInstances
@@ -20,7 +21,7 @@ Orphan instances allowing generic deriving of 'Group' instances:
 > >   }
 > >   deriving Generic
 > >   deriving ( Semigroup, Monoid, Group )
-> >     via Generically MyRecord
+> >     via GenericProduct MyRecord
 
 Also includes some instances for newtypes from @base@ such as 'Identity' and 'Const'.
 -}
@@ -47,7 +48,7 @@ import GHC.Generics
 
 -- generic-data
 import Generic.Data
-  ( Generically(..) )
+  ( Generically(..), GenericProduct(..) )
 
 -- groups
 import Data.Group
@@ -86,7 +87,18 @@ gpow x n = to ( pow @( Rep g () ) ( from x ) n )
 
 instance
   ( Generic g
-  , Group ( Rep g () )
+  , Monoid ( GenericProduct g )
+  , Group  ( Rep g () )
+  )
+  => Group ( GenericProduct g ) where
+  invert  = ginvert
+  pow x n = gpow x n
+
+instance
+  ( Generic g
+  , Semigroup g
+  , Monoid ( Generically g )
+  , Group  ( Rep g () )
   )
   => Group ( Generically g ) where
   invert  = ginvert
@@ -120,9 +132,19 @@ instance Abelian (f (g p)) => Abelian ((:.:) f g p)
 
 instance
   ( Generic g
+  , Monoid  ( GenericProduct g )
+  , Abelian ( Rep g () )
+  )
+  => Abelian ( GenericProduct g )
+
+instance
+  ( Generic g
+  , Semigroup g
+  , Monoid  ( Generically g )
   , Abelian ( Rep g () )
   )
   => Abelian ( Generically g )
+
 
 -- Other useful instances.
 instance Abelian a => Abelian (Down a)

@@ -17,7 +17,7 @@ import GHC.Generics
 
 -- generic-data
 import Generic.Data
-  ( Generically(..) )
+  ( GenericProduct(..) )
 
 -- groups
 import Data.Group
@@ -33,7 +33,7 @@ data Point2D a = Point2D !a !a
   deriving stock Generic
 newtype Vector2D a = Vector2D { tip :: Point2D a }
   deriving ( Semigroup, Monoid, Group )
-    via Generically ( Point2D ( Sum a ) )
+    via GenericProduct ( Point2D ( Sum a ) )
 
 data MyRecord
   = MyRecord
@@ -43,5 +43,5 @@ data MyRecord
   }
   deriving stock Generic
   deriving ( Semigroup, Monoid, Group )
-    via Generically MyRecord
+    via GenericProduct MyRecord
 ```
