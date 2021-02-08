@@ -1,6 +1,6 @@
 cabal-version:  2.4
 name:           groups-generic
-version:        0.1.0.0
+version:        0.2.0.0
 synopsis:       Generically derive Group instances.
 category:       Algebra, Math
 license:        BSD-3-Clause
@@ -32,11 +32,11 @@ library
 
   build-depends: 
       base
-        >= 4.12 && < 4.15
+        >= 4.12 && < 4.17
     , generic-data
-        ^>= 0.8.0.0
+        >= 0.8.0.0 && < 0.10
     , groups
-        ^>= 0.4.0.0
+        >= 0.4.0.0 && < 0.6
 
   hs-source-dirs:
       src
@@ -50,3 +50,6 @@ library
       -fwarn-missing-local-signatures
       -fwarn-incomplete-uni-patterns
       -fwarn-missing-deriving-strategies
+
+  default-language:
+      Haskell2010

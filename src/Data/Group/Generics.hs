@@ -1,5 +1,6 @@
 {-# LANGUAGE
-    FlexibleContexts
+    CPP
+  , FlexibleContexts
   , MonoLocalBinds
   , ScopedTypeVariables
   , TypeApplications
@@ -7,6 +8,7 @@
 #-}
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -fno-warn-unused-imports #-}
 
 {-|
 Module: Data.Group.Generics
@@ -57,28 +59,6 @@ import Data.Group
 -----------------------------------------------------------------------
 -- Instances for 'Group'.
 
-instance Group (U1 p) where
-  invert _ = U1
-  pow  _ _ = U1
-instance Group (f p) => Group (Rec1 f p) where
-  invert (Rec1 g) = Rec1 (invert g)
-  pow (Rec1 g) n = Rec1 (pow g n)
-instance Group (f p) => Group (M1 i c f p) where
-  invert (M1 g) = M1 (invert g)
-  pow (M1 g) n = M1 (pow g n)
-instance Group g => Group (K1 i g p) where
-  invert (K1 g) = K1 (invert g)
-  pow (K1 g) n = K1 (pow g n)
-instance Group g => Group (Par1 g) where
-  invert (Par1 g) = Par1 (invert g)
-  pow (Par1 g) n = Par1 (pow g n)
-instance (Group (f1 p), Group (f2 p) ) => Group ((:*:) f1 f2 p) where
-  invert ( g1 :*: g2 ) = ( invert g1 :*: invert g2 )
-  pow ( g1 :*: g2 ) n = ( pow g1 n :*: pow g2 n )
-instance Group (f (g p)) => Group ((:.:) f g p) where
-  invert (Comp1 g) = Comp1 (invert g)
-  pow (Comp1 g) n = Comp1 (pow g n)
-
 ginvert :: forall g. ( Generic g, Group ( Rep g () ) ) => g -> g
 ginvert = to . invert @( Rep g () ) . from
 
@@ -104,7 +84,29 @@ instance
   invert  = ginvert
   pow x n = gpow x n
 
--- Other useful instances.
+instance Group (U1 p) where
+  invert _ = U1
+  pow  _ _ = U1
+instance Group (f p) => Group (Rec1 f p) where
+  invert (Rec1 g) = Rec1 (invert g)
+  pow (Rec1 g) n = Rec1 (pow g n)
+instance Group (f p) => Group (M1 i c f p) where
+  invert (M1 g) = M1 (invert g)
+  pow (M1 g) n = M1 (pow g n)
+instance Group g => Group (K1 i g p) where
+  invert (K1 g) = K1 (invert g)
+  pow (K1 g) n = K1 (pow g n)
+instance Group g => Group (Par1 g) where
+  invert (Par1 g) = Par1 (invert g)
+  pow (Par1 g) n = Par1 (pow g n)
+
+#if !MIN_VERSION_groups(0,5,0)
+instance (Group (f1 p), Group (f2 p) ) => Group ((:*:) f1 f2 p) where
+  invert ( g1 :*: g2 ) = ( invert g1 :*: invert g2 )
+  pow ( g1 :*: g2 ) n = ( pow g1 n :*: pow g2 n )
+instance Group (f (g p)) => Group ((:.:) f g p) where
+  invert (Comp1 g) = Comp1 (invert g)
+  pow (Comp1 g) n = Comp1 (pow g n)
 instance Group a => Group (Down a) where
   invert (Down a) = Down (invert a)
   pow (Down a) n = Down (pow a n)
@@ -117,18 +119,10 @@ instance Group a => Group (Const a b) where
 instance Group (Proxy s) where
   invert _ = Proxy
   pow  _ _ = Proxy
-
+#endif
 
 -----------------------------------------------------------------------
 -- Instances for 'Abelian'.
-
-instance Abelian (U1 p)
-instance Abelian (f p) => Abelian (Rec1 f p)
-instance Abelian (f p) => Abelian (M1 i c f p)
-instance Abelian g => Abelian (K1 i g p)
-instance Abelian g => Abelian (Par1 g)
-instance (Abelian (f1 p), Abelian (f2 p)) => Abelian ((:*:) f1 f2 p)
-instance Abelian (f (g p)) => Abelian ((:.:) f g p)
 
 instance
   ( Generic g
@@ -145,9 +139,17 @@ instance
   )
   => Abelian ( Generically g )
 
+#if !MIN_VERSION_groups(0,5,0)
+instance Abelian (U1 p)
+instance Abelian (f p) => Abelian (Rec1 f p)
+instance Abelian (f p) => Abelian (M1 i c f p)
+instance Abelian g => Abelian (K1 i g p)
+instance Abelian g => Abelian (Par1 g)
+instance (Abelian (f1 p), Abelian (f2 p)) => Abelian ((:*:) f1 f2 p)
+instance Abelian (f (g p)) => Abelian ((:.:) f g p)
 
--- Other useful instances.
 instance Abelian a => Abelian (Down a)
 instance Abelian a => Abelian (Identity a) where
 instance Abelian a => Abelian (Const a b) where
 instance Abelian (Proxy s) where
+#endif
