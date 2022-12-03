@@ -1,6 +1,6 @@
 cabal-version:  2.4
 name:           groups-generic
-version:        0.2.0.0
+version:        0.3.0.0
 synopsis:       Generically derive Group instances.
 category:       Algebra, Math
 license:        BSD-3-Clause
@@ -14,6 +14,9 @@ extra-source-files:
 description:
   Generically derive group instances:
   .
+  > {-# LANGUAGE DeriveGeneric, DerivingVia #-}
+  > import GHC.Generics ( Generic, Generically (..) )
+  >
   > data MyRecord
   >   = MyRecord
   >   { field1 :: Sum Double
@@ -22,7 +25,7 @@ description:
   >   }
   >   deriving Generic
   >   deriving ( Semigroup, Monoid, Group )
-  >     via GenericProduct MyRecord
+  >     via Generically MyRecord
 
 source-repository head
   type: git
@@ -30,13 +33,16 @@ source-repository head
 
 library
 
-  build-depends: 
+  build-depends:
       base
-        >= 4.12 && < 4.17
-    , generic-data
-        >= 0.8.0.0 && < 0.10
+        >= 4.12 && < 4.18
     , groups
         >= 0.4.0.0 && < 0.6
+
+  if impl(ghc < 9.3)
+    build-depends:
+      generic-data
+        >= 0.8.0.0 && < 0.10
 
   hs-source-dirs:
       src

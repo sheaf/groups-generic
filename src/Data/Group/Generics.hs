@@ -43,14 +43,12 @@ import Data.Ord
 import Data.Proxy
   ( Proxy(..) )
 import GHC.Generics
-  ( Generic(..)
-  , U1(..), Rec1(..), M1(..), K1(..), Par1(..)
-  , (:*:)(..), (:.:)(..)
-  )
 
+#if __GLASGOW_HASKELL__ < 903
 -- generic-data
 import Generic.Data
   ( Generically(..), GenericProduct(..) )
+#endif
 
 -- groups
 import Data.Group
@@ -67,22 +65,12 @@ gpow x n = to ( pow @( Rep g () ) ( from x ) n )
 
 instance
   ( Generic g
-  , Monoid ( GenericProduct g )
-  , Group  ( Rep g () )
-  )
-  => Group ( GenericProduct g ) where
-  invert  = ginvert
-  pow x n = gpow x n
-
-instance
-  ( Generic g
-  , Semigroup g
   , Monoid ( Generically g )
   , Group  ( Rep g () )
   )
   => Group ( Generically g ) where
-  invert  = ginvert
-  pow x n = gpow x n
+  invert (Generically g) = Generically ( ginvert g )
+  pow (Generically x) n = Generically ( gpow x n )
 
 instance Group (U1 p) where
   invert _ = U1
@@ -126,15 +114,7 @@ instance Group (Proxy s) where
 
 instance
   ( Generic g
-  , Monoid  ( GenericProduct g )
-  , Abelian ( Rep g () )
-  )
-  => Abelian ( GenericProduct g )
-
-instance
-  ( Generic g
-  , Semigroup g
-  , Monoid  ( Generically g )
+  , Group ( Generically g )
   , Abelian ( Rep g () )
   )
   => Abelian ( Generically g )
