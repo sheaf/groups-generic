@@ -15,19 +15,18 @@ Module: Data.Group.Generics
 
 Orphan instances allowing generic deriving of 'Group' instances:
 
-> > data MyRecord
-> >   = MyRecord
-> >   { field1 :: Sum Double
-> >   , field2 :: Product Double
-> >   , field3 :: ( Sum Int, Sum Int )
-> >   }
-> >   deriving Generic
-> >   deriving ( Semigroup, Monoid, Group )
-> >     via GenericProduct MyRecord
+>  > data MyRecord
+>  >   = MyRecord
+>  >   { field1 :: Sum Double
+>  >   , field2 :: Product Double
+>  >   , field3 :: ( Sum Int, Sum Int )
+>  >   }
+>  >   deriving Generic
+>  >   deriving ( Semigroup, Monoid, Group )
+>  >     via Generically MyRecord
 
 Also includes some instances for newtypes from @base@ such as 'Identity' and 'Const'.
 -}
-
 
 module Data.Group.Generics
   ( )
@@ -62,6 +61,17 @@ ginvert = to . invert @( Rep g () ) . from
 
 gpow :: forall n g. ( Integral n, Generic g, Group ( Rep g () ) ) => g -> n -> g
 gpow x n = to ( pow @( Rep g () ) ( from x ) n )
+
+#if __GLASGOW_HASKELL__ < 903
+instance
+  ( Generic g
+  , Monoid ( GenericProduct g )
+  , Group  ( Rep g () )
+  )
+  => Group ( GenericProduct g ) where
+  invert  = ginvert
+  pow x n = gpow x n
+#endif
 
 instance
   ( Generic g
@@ -118,6 +128,15 @@ instance
   , Abelian ( Rep g () )
   )
   => Abelian ( Generically g )
+
+#if __GLASGOW_HASKELL__ < 903
+instance
+  ( Generic g
+  , Monoid  ( GenericProduct g )
+  , Abelian ( Rep g () )
+  )
+  => Abelian ( GenericProduct g )
+#endif
 
 #if !MIN_VERSION_groups(0,5,0)
 instance Abelian (U1 p)

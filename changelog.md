@@ -1,5 +1,9 @@
 # Changelog for package `generic-groups`
 
+## 0.3.1.0 ( December 4, 2022 )
+
+* Fix support for GHC 9.2 and older, which was broken by version `0.3.0.0`.
+
 ## 0.3.0.0 ( December 3, 2022 )
 
 * Support GHC 9.4.
